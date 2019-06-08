@@ -4,7 +4,8 @@ import axios from 'axios'
 import {
   Header,
   Container,
-  List
+  List,
+  Button
 } from 'semantic-ui-react'
 import UserEntry from './UserEntry'
 
@@ -12,7 +13,9 @@ import UserEntry from './UserEntry'
 class App extends Component {
   state = {
     users: [],
-    errorMessage: ''
+    errorMessage: '',
+    pageNumber: 1,
+    totalPages: 1
   }
 
   componentDidMount() {
@@ -26,19 +29,33 @@ class App extends Component {
     //   })
   }
 
+  incrementPageNumber = () => {
+    this.setState({ pageNumber: this.state.pageNumber + 1 }, () => {
+      this.fetchUsers()
+    })
+  }
+
+  decresePageNumber = () => {
+    this.setState({ pageNumber: this.state.pageNumber - 1 }, () => {
+      this.fetchUsers()
+    })
+  }
+
 
   fetchUsers = async () => {
     try {
-      let response = await axios.get('https://reqres.in/api/users/23')
-      this.setState({ users: [response.data.data] })
+      let response = await axios.get(`https://reqres.in/api/users?per_page=5&page=${this.state.pageNumber}`)
+      console.log(response.data)
+      this.setState({ users: response.data.data, totalPages: response.data.total_pages })
     }
-    catch(error) {
+    catch (error) {
       this.setState({ errorMessage: `Oh! a ${error.request.status}` })
+
     }
 
   }
 
-  displayErrorMessage = () => {
+  displayErrorMessage() {
     return (
       <Header as='h3'>{this.state.errorMessage}</Header>
     )
@@ -58,6 +75,20 @@ class App extends Component {
           <List>
             {usersList}
           </List>
+          <Button
+            primary
+            disabled={this.state.pageNumber === 1 }
+            onClick={this.decresePageNumber.bind(this)}
+          >
+            Previous Page
+            </Button>
+          <Button
+            primary
+            disabled={this.state.pageNumber === this.state.totalPages }
+            onClick={this.incrementPageNumber.bind(this)}
+          >
+            Next Page
+            </Button>
         </Container>
 
       </>

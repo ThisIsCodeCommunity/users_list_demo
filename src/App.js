@@ -5,7 +5,8 @@ import {
   Header,
   Container,
   List,
-  Button
+  Button,
+  Pagination
 } from 'semantic-ui-react'
 import UserEntry from './UserEntry'
 
@@ -29,14 +30,8 @@ class App extends Component {
     //   })
   }
 
-  incrementPageNumber = () => {
-    this.setState({ pageNumber: this.state.pageNumber + 1 }, () => {
-      this.fetchUsers()
-    })
-  }
-
-  decresePageNumber = () => {
-    this.setState({ pageNumber: this.state.pageNumber - 1 }, () => {
+  handlePageNumber = (data) => {
+    this.setState({ pageNumber: data.activePage }, () => {
       this.fetchUsers()
     })
   }
@@ -75,20 +70,17 @@ class App extends Component {
           <List>
             {usersList}
           </List>
-          <Button
-            primary
-            disabled={this.state.pageNumber === 1 }
-            onClick={this.decresePageNumber.bind(this)}
-          >
-            Previous Page
-            </Button>
-          <Button
-            primary
-            disabled={this.state.pageNumber === this.state.totalPages }
-            onClick={this.incrementPageNumber.bind(this)}
-          >
-            Next Page
-            </Button>
+
+          <Pagination
+            boundaryRange={0}
+            onPageChange={(event, data) => this.handlePageNumber(data)}
+            defaultActivePage={1}
+            ellipsisItem={null}
+            firstItem={null}
+            lastItem={null}
+            siblingRange={1}
+            totalPages={this.state.totalPages}
+          />
         </Container>
 
       </>
